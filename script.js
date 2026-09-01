@@ -119,7 +119,7 @@
     formulario.addEventListener('submit', function (e) {
       e.preventDefault();
 
-      var requeridos = ['nombre', 'telefono', 'mensaje'];
+      var requeridos = ['nombre', 'telefono', 'pais', 'mensaje'];
       var faltante = null;
 
       requeridos.forEach(function (id) {
@@ -147,6 +147,7 @@
       ];
 
       if (valor('correo')) lineas.push('Correo: ' + valor('correo'));
+      if (valor('pais')) lineas.push('País: ' + valor('pais'));
       if (valor('ciudad')) lineas.push('Ciudad: ' + valor('ciudad'));
       if (valor('equipo')) lineas.push('Equipo de interés: ' + valor('equipo'));
 

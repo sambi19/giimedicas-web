@@ -5,6 +5,9 @@ Reemplaza el sitio anterior de `giimedicas.com` conservando su estructura
 (Inicio, Quiénes somos, Productos, Términos y condiciones, Contáctenos) con un
 diseño actual, responsive y optimizado para conversión por WhatsApp.
 
+Cobertura comercial: **toda Latinoamérica**, con envíos por transportadora y
+courier internacional.
+
 ## Contenido
 
 ```
@@ -23,6 +26,7 @@ _headers                   Cabeceras de seguridad y caché (Netlify / Cloudflare
 - **Responsive** desde 320 px hasta escritorio.
 - **Catálogo filtrable** por categoría (NLS, biorresonancia, diagnóstico, terapia).
 - **Formulario que abre WhatsApp** con el mensaje ya redactado — no requiere backend.
+  Incluye selector de país (20 opciones) para calificar el lead desde el primer contacto.
 - **SEO:** metadatos Open Graph, datos estructurados `schema.org/Organization`,
   `sitemap.xml` y `robots.txt`.
 - **Accesibilidad:** navegación por teclado, `aria-*` en el menú y los filtros,
