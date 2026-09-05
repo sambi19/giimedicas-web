@@ -5,6 +5,9 @@
   'use strict';
 
   var WHATSAPP = '573116891425';
+  var CORREO   = 'drchristianpedraza@gmail.com';
+
+  var sinMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   /* ---------- Año actual en el pie ---------- */
   var anio = document.getElementById('anio');
@@ -32,10 +35,6 @@
       if (e.target.tagName === 'A') cerrarMenu();
     });
 
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') cerrarMenu();
-    });
-
     document.addEventListener('click', function (e) {
       if (!menu.contains(e.target) && !boton.contains(e.target)) cerrarMenu();
     });
@@ -49,6 +48,102 @@
     };
     actualizarNav();
     window.addEventListener('scroll', actualizarNav, { passive: true });
+  }
+
+  /* ==========================================================
+     Banner animado
+     ========================================================== */
+  var pista = document.getElementById('banner-pista');
+
+  if (pista) {
+    var laminas = Array.prototype.slice.call(pista.querySelectorAll('.banner__lamina'));
+    var puntos  = Array.prototype.slice.call(document.querySelectorAll('.banner__punto'));
+    var actual  = 0;
+    var temporizador = null;
+    var INTERVALO = 6500;
+
+    function mostrar(indice) {
+      actual = (indice + laminas.length) % laminas.length;
+
+      laminas.forEach(function (lamina, i) {
+        var activa = i === actual;
+        lamina.classList.toggle('es-activa', activa);
+        lamina.setAttribute('aria-hidden', String(!activa));
+        // Los enlaces de las láminas ocultas no deben recibir foco
+        lamina.querySelectorAll('a').forEach(function (a) {
+          a.tabIndex = activa ? 0 : -1;
+        });
+      });
+
+      puntos.forEach(function (punto, i) {
+        punto.classList.toggle('es-activo', i === actual);
+        punto.setAttribute('aria-selected', String(i === actual));
+      });
+    }
+
+    function avanzar()  { mostrar(actual + 1); }
+    function retroceder() { mostrar(actual - 1); }
+
+    function arrancar() {
+      if (sinMovimiento || laminas.length < 2) return;
+      detener();
+      temporizador = window.setInterval(avanzar, INTERVALO);
+    }
+    function detener() {
+      if (temporizador) { window.clearInterval(temporizador); temporizador = null; }
+    }
+    // Reinicia el conteo tras una interacción manual
+    function reiniciar() { detener(); arrancar(); }
+
+    var siguiente = document.getElementById('banner-next');
+    var anterior  = document.getElementById('banner-prev');
+
+    if (siguiente) siguiente.addEventListener('click', function () { avanzar(); reiniciar(); });
+    if (anterior)  anterior.addEventListener('click',  function () { retroceder(); reiniciar(); });
+
+    puntos.forEach(function (punto, i) {
+      punto.addEventListener('click', function () { mostrar(i); reiniciar(); });
+    });
+
+    var banner = document.querySelector('.banner');
+    if (banner) {
+      banner.addEventListener('mouseenter', detener);
+      banner.addEventListener('mouseleave', arrancar);
+      banner.addEventListener('focusin', detener);
+      banner.addEventListener('focusout', arrancar);
+
+      // Flechas del teclado
+      banner.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowRight') { avanzar(); reiniciar(); }
+        if (e.key === 'ArrowLeft')  { retroceder(); reiniciar(); }
+      });
+
+      // Deslizar en pantallas táctiles
+      var inicioX = 0, inicioY = 0;
+      banner.addEventListener('touchstart', function (e) {
+        inicioX = e.changedTouches[0].clientX;
+        inicioY = e.changedTouches[0].clientY;
+        detener();
+      }, { passive: true });
+
+      banner.addEventListener('touchend', function (e) {
+        var dx = e.changedTouches[0].clientX - inicioX;
+        var dy = e.changedTouches[0].clientY - inicioY;
+        // Solo cuenta como deslizamiento horizontal
+        if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) {
+          if (dx < 0) avanzar(); else retroceder();
+        }
+        arrancar();
+      }, { passive: true });
+    }
+
+    // Pausa mientras la pestaña está en segundo plano
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) detener(); else arrancar();
+    });
+
+    mostrar(0);
+    arrancar();
   }
 
   /* ---------- Filtro de productos ---------- */
@@ -73,6 +168,97 @@
     });
   }
 
+  /* ==========================================================
+     Ficha de producto (modal)
+     ========================================================== */
+  var modal = document.getElementById('modal');
+
+  if (modal && tarjetas.length) {
+    var mFoto      = document.getElementById('modal-foto');
+    var mTitulo    = document.getElementById('modal-titulo');
+    var mCategoria = document.getElementById('modal-categoria');
+    var mTexto     = document.getElementById('modal-texto');
+    var mWa        = document.getElementById('modal-wa');
+    var mCorreo    = document.getElementById('modal-correo');
+    var mCerrar    = document.getElementById('modal-cerrar');
+    var ultimoFoco = null;
+
+    var NOMBRES = {
+      nls: 'Escáner NLS',
+      biorresonancia: 'Biorresonancia',
+      diagnostico: 'Diagnóstico',
+      terapia: 'Terapia'
+    };
+
+    function abrir(tarjeta) {
+      var img     = tarjeta.querySelector('.producto__media img');
+      var nombre  = tarjeta.querySelector('.producto__nombre').textContent.trim();
+      var detalle = tarjeta.querySelector('.producto__detalle');
+      var esContenida = tarjeta.querySelector('.producto__media--contener');
+
+      mFoto.src = img.getAttribute('src');
+      mFoto.alt = img.getAttribute('alt') || nombre;
+      // Las fichas y capturas se muestran completas, no recortadas
+      mFoto.style.objectFit = esContenida ? 'contain' : 'cover';
+
+      mTitulo.textContent = nombre;
+      mCategoria.textContent = NOMBRES[tarjeta.dataset.categoria] || 'Equipo';
+      mTexto.innerHTML = detalle ? detalle.innerHTML : '';
+
+      var asunto = 'Cotización: ' + nombre;
+      mWa.href = 'https://wa.me/' + WHATSAPP + '?text=' +
+                 encodeURIComponent('Hola GII Médicas, quiero información y precio del ' + nombre + '.');
+      mCorreo.href = 'mailto:' + CORREO +
+                     '?subject=' + encodeURIComponent(asunto) +
+                     '&body=' + encodeURIComponent('Hola, quiero información y precio del ' + nombre + '.\n\nPaís:\nCiudad:\nTeléfono:');
+
+      ultimoFoco = document.activeElement;
+      modal.hidden = false;
+      document.body.classList.add('esta-bloqueado');
+      mCerrar.focus();
+    }
+
+    function cerrar() {
+      modal.hidden = true;
+      document.body.classList.remove('esta-bloqueado');
+      if (ultimoFoco) ultimoFoco.focus();
+    }
+
+    tarjetas.forEach(function (tarjeta) {
+      var disparador = tarjeta.querySelector('.producto__disparador');
+      if (disparador) {
+        disparador.addEventListener('click', function () { abrir(tarjeta); });
+      }
+    });
+
+    mCerrar.addEventListener('click', cerrar);
+    modal.querySelector('[data-cerrar]').addEventListener('click', cerrar);
+
+    // El foco no debe escaparse de la ficha mientras está abierta
+    modal.addEventListener('keydown', function (e) {
+      if (e.key !== 'Tab') return;
+      var foco = modal.querySelectorAll('a[href], button:not([disabled])');
+      if (!foco.length) return;
+      var primero = foco[0];
+      var ultimo = foco[foco.length - 1];
+
+      if (e.shiftKey && document.activeElement === primero) {
+        e.preventDefault(); ultimo.focus();
+      } else if (!e.shiftKey && document.activeElement === ultimo) {
+        e.preventDefault(); primero.focus();
+      }
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && !modal.hidden) cerrar();
+    });
+  }
+
+  // Escape también cierra el menú móvil
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') cerrarMenu();
+  });
+
   /* ---------- Enlace activo según la sección visible ---------- */
   var enlaces = Array.prototype.slice.call(document.querySelectorAll('.menu a[href^="#"]'));
   var secciones = enlaces
@@ -94,7 +280,6 @@
 
   /* ---------- Animación de entrada ---------- */
   var revelables = Array.prototype.slice.call(document.querySelectorAll('.revelar'));
-  var sinMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   if (!sinMovimiento && 'IntersectionObserver' in window && revelables.length) {
     var observador = new IntersectionObserver(function (entradas, obs) {
@@ -147,7 +332,7 @@
       ];
 
       if (valor('correo')) lineas.push('Correo: ' + valor('correo'));
-      if (valor('pais')) lineas.push('País: ' + valor('pais'));
+      if (valor('pais'))   lineas.push('País: ' + valor('pais'));
       if (valor('ciudad')) lineas.push('Ciudad: ' + valor('ciudad'));
       if (valor('equipo')) lineas.push('Equipo de interés: ' + valor('equipo'));
 
