@@ -148,39 +148,60 @@ svg{width:100%;height:100%}
    ========================================================== */
 .banner{
   position:relative;overflow:hidden;background:var(--azul-900);
-  height:clamp(500px,72vh,660px);
+  min-height:clamp(500px,72vh,660px);
+  display:grid;
 }
-.banner__pista{position:absolute;inset:0}
+.banner__pista{display:grid;grid-template-areas:"lamina"}
 
 .banner__lamina{
-  position:absolute;inset:0;
+  grid-area:lamina;position:relative;
   display:flex;align-items:center;
+  padding-block:clamp(40px,6vw,64px);
   opacity:0;visibility:hidden;
   transition:opacity .9s ease,visibility .9s ease;
 }
 .banner__lamina.es-activa{opacity:1;visibility:visible;z-index:2}
 
-.banner__foto{
+/* Ambiente: la misma foto desenfocada, solo como fondo */
+.banner__ambiente{
   position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
   transform:scale(1.06);
 }
-/* Zoom lento mientras la lámina está visible */
-.banner__lamina.es-activa .banner__foto{
-  animation:panoramica 9s ease-out forwards;
+.banner__lamina.es-activa .banner__ambiente{
+  animation:panoramica 12s ease-out forwards;
 }
 @keyframes panoramica{
-  from{transform:scale(1.02)}
-  to{transform:scale(1.13)}
+  from{transform:scale(1.04)}
+  to{transform:scale(1.14)}
 }
 
 .banner__velo{
   position:absolute;inset:0;
   background:
-    linear-gradient(100deg, rgba(4,26,45,.94) 0%, rgba(6,42,74,.86) 38%, rgba(6,42,74,.42) 66%, rgba(6,42,74,.22) 100%),
-    linear-gradient(0deg, rgba(4,26,45,.5), transparent 45%);
+    linear-gradient(100deg, rgba(4,26,45,.92) 0%, rgba(6,42,74,.8) 42%, rgba(6,42,74,.52) 100%),
+    linear-gradient(0deg, rgba(4,26,45,.45), transparent 50%);
 }
 
-.banner__contenido{position:relative;z-index:2;color:#fff;max-width:var(--ancho)}
+/* Texto a la izquierda, fotografia completa a la derecha */
+.banner__rejilla{
+  position:relative;z-index:2;width:100%;
+  display:grid;grid-template-columns:1.02fr .98fr;
+  gap:clamp(28px,4vw,60px);align-items:center;
+}
+
+.banner__figura{margin:0;display:flex;align-items:center;justify-content:center}
+.banner__figura img{
+  width:100%;height:auto;
+  max-height:min(56vh,420px);object-fit:contain;
+  border-radius:18px;
+  box-shadow:0 26px 60px rgba(2,17,32,.5);
+}
+.js .banner__figura{opacity:0;transform:translateY(26px) scale(.97)}
+.banner__lamina.es-activa .banner__figura{
+  animation:entrar .8s cubic-bezier(.22,1,.36,1) .3s forwards;
+}
+
+.banner__contenido{position:relative;z-index:2;color:#fff}
 /* Solo se ocultan para animar cuando hay JS; sin el, el texto se ve siempre */
 .js .banner__contenido > *{
   opacity:0;transform:translateY(26px);
@@ -204,14 +225,14 @@ svg{width:100%;height:100%}
 
 .banner__contenido h1,
 .banner__contenido h2{
-  color:#fff;margin-bottom:18px;max-width:16ch;
+  color:#fff;margin-bottom:18px;max-width:14ch;
   font-size:clamp(2rem,4.6vw,3.5rem);text-shadow:0 2px 24px rgba(2,17,32,.4);
 }
 .banner__contenido h1 em,
 .banner__contenido h2 em{font-style:normal;color:var(--teal-200)}
 .banner__contenido p{
-  font-size:clamp(1rem,1.5vw,1.14rem);color:rgba(255,255,255,.88);
-  max-width:52ch;margin-bottom:32px;text-shadow:0 1px 12px rgba(2,17,32,.4);
+  font-size:clamp(1rem,1.5vw,1.1rem);color:rgba(255,255,255,.88);
+  max-width:46ch;margin-bottom:32px;text-shadow:0 1px 12px rgba(2,17,32,.4);
 }
 .banner__acciones{display:flex;gap:14px;flex-wrap:wrap}
 
@@ -229,7 +250,7 @@ svg{width:100%;height:100%}
 .banner__flecha--next{right:20px}
 
 .banner__puntos{
-  position:absolute;bottom:26px;left:50%;transform:translateX(-50%);z-index:5;
+  position:absolute;bottom:20px;left:50%;transform:translateX(-50%);z-index:5;
   display:flex;gap:10px;
 }
 .banner__punto{
@@ -389,6 +410,35 @@ svg{width:100%;height:100%}
 .modal__cerrar:hover{transform:rotate(90deg);background:#fff}
 .modal__cerrar svg{width:20px;height:20px}
 
+/* ---------- Video ---------- */
+.seccion--oscura{
+  background:linear-gradient(160deg,var(--azul-900),#0a3d67 60%,#0b4f6b);
+  border-block:none;color:rgba(255,255,255,.8);
+}
+.seccion--oscura h2{color:#fff}
+.seccion--oscura .encabezado p{color:rgba(255,255,255,.78)}
+.etiqueta--clara{color:var(--teal-200)}
+
+.reproductor{
+  margin:0 auto;max-width:900px;
+  border-radius:18px;overflow:hidden;
+  background:#000;
+  box-shadow:0 30px 70px rgba(2,17,32,.5);
+  border:1px solid rgba(255,255,255,.14);
+}
+.reproductor video{
+  display:block;width:100%;height:auto;aspect-ratio:960/544;
+  background:#000;
+}
+.reproductor figcaption{
+  padding:14px 20px;font-size:.86rem;color:rgba(255,255,255,.6);
+  background:rgba(2,17,32,.55);text-align:center;
+}
+
+.video__acciones{
+  display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:34px;
+}
+
 /* ---------- Proceso ---------- */
 .proceso{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:28px;counter-reset:paso}
 .paso{position:relative;padding-top:16px}
@@ -521,7 +571,9 @@ svg{width:100%;height:100%}
   .menu.esta-abierto{display:flex}
   .menu a{padding:13px 12px;font-size:.98rem}
   .barra-info .contenedor{justify-content:center;text-align:center;gap:14px}
-  .banner{height:clamp(460px,74vh,600px)}
+  .banner{min-height:clamp(460px,70vh,580px)}
+  .banner__rejilla{grid-template-columns:1fr;gap:28px}
+  .banner__figura img{max-height:30vh}
   .banner__flecha{width:44px;height:44px}
   .banner__flecha--prev{left:10px}
   .banner__flecha--next{right:10px}
@@ -536,9 +588,9 @@ svg{width:100%;height:100%}
   .indicadores__rejilla{grid-template-columns:1fr 1fr;gap:22px}
   .pie__rejilla{grid-template-columns:1fr}
   .btn{width:100%}
-  .banner__acciones,.llamado__acciones{flex-direction:column;width:100%}
-  .banner{height:auto;min-height:78vh;padding:56px 0 72px}
-  .banner__lamina{position:absolute;padding-block:20px}
+  .banner__acciones,.llamado__acciones,.video__acciones{flex-direction:column;width:100%}
+  .banner{min-height:440px}
+  .banner__figura img{max-height:30vh;border-radius:14px}
   .banner__contenido h1,.banner__contenido h2{max-width:100%}
   .banner__flecha{display:none}
   .banner__puntos{bottom:18px}
@@ -554,5 +606,6 @@ svg{width:100%;height:100%}
   *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
   .js .revelar{opacity:1;transform:none}
   .js .banner__contenido > *{opacity:1;transform:none}
+  .js .banner__figura{opacity:1;transform:none}
   .banner__foto{transform:none}
 }

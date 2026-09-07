@@ -16,7 +16,8 @@ styles.css                 Hoja de estilos (variables CSS, sin dependencias)
 script.js                  Menú móvil, filtros de catálogo, animaciones, formulario
 assets/favicon.svg         Ícono del sitio
 assets/img/                Fotografías de los equipos (1200x900, normalizadas)
-assets/img/banner/         Versiones panorámicas para el banner (2000x1000)
+assets/img/banner/         Fotos completas del banner y sus fondos desenfocados
+assets/video/              Video de demostración y su imagen de portada
 robots.txt · sitemap.xml   SEO básico
 _headers                   Cabeceras de seguridad y caché (Netlify / Cloudflare Pages)
 ```
@@ -25,9 +26,11 @@ _headers                   Cabeceras de seguridad y caché (Netlify / Cloudflare
 
 - **Sin dependencias ni build.** HTML, CSS y JavaScript puro. Se publica tal cual.
 - **Responsive** desde 320 px hasta escritorio.
-- **Banner animado** en la portada: 4 láminas con rotación automática cada 6,5 s, zoom
-  lento sobre la fotografía, flechas, puntos, deslizamiento táctil y flechas del teclado.
-  Se pausa al pasar el cursor, al enfocar con teclado y con la pestaña en segundo plano.
+- **Banner animado** en la portada: 2 láminas con rotación automática cada 6,5 s,
+  flechas, puntos, deslizamiento táctil y flechas del teclado. Se pausa al pasar el
+  cursor, al enfocar con teclado y con la pestaña en segundo plano.
+- **Video de demostración** con imagen de portada y `preload="none"`: el archivo solo
+  se descarga cuando el visitante pulsa reproducir.
 - **Catálogo filtrable** por categoría (NLS, biorresonancia, diagnóstico, terapia).
 - **Ficha de producto emergente:** al tocar cualquier equipo se abre un modal con la
   fotografía ampliada, la explicación completa, las especificaciones y el enlace directo
@@ -44,10 +47,14 @@ _headers                   Cabeceras de seguridad y caché (Netlify / Cloudflare
 
 ## Imágenes
 
-Las fotografías originales tenían tamaños y encuadres dispares. Se normalizaron a
-1200x900 (4:3) con fondo blanco y un realce suave de contraste, y se generaron recortes
-panorámicos de 2000x1000 para el banner. El póster del Bioplasm 10D se muestra recortado
-en la tarjeta y completo dentro de su ficha.
+Las fotografías originales tenían tamaños y encuadres dispares. Para el catálogo se
+normalizaron a 1200x900 (4:3) con fondo blanco y un realce suave de contraste. El póster
+del Bioplasm 10D se muestra recortado en la tarjeta y completo dentro de su ficha.
+
+En el banner las fotos **no se recortan**: se muestran enteras dentro de su columna, y el
+fondo se cubre con la misma imagen desenfocada y oscurecida (`fondo-*.jpg`). Así el
+equipo se ve completo en cualquier tamaño de pantalla, incluido el móvil, donde la foto
+pasa debajo del texto.
 
 Para regenerarlas tras reemplazar una foto, use `assets/img/` como destino y mantenga
 las proporciones indicadas.
